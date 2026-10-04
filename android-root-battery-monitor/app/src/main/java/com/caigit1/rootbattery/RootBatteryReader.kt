@@ -41,7 +41,7 @@ class RootBatteryReader {
             )
         }
 
-        MonitorResult.Success(parsed.toSnapshot())
+        MonitorResult.Success(UeventParser.toSnapshot(parsed))
     }
 
     suspend fun selfCheck(): List<SelfCheckItem> = withContext(Dispatchers.IO) {
@@ -94,16 +94,16 @@ private object UeventParser {
             .toMap()
     }
 
-    fun Map<String, String>.toSnapshot(): BatterySnapshot {
+    fun toSnapshot(values: Map<String, String>): BatterySnapshot {
         val now = System.currentTimeMillis()
         return BatterySnapshot(
             timestampMs = now,
-            levelPercent = this["POWER_SUPPLY_CAPACITY"]?.toIntOrNull(),
-            temperatureCelsius = this["POWER_SUPPLY_TEMP"]?.toDoubleOrNull()?.div(10.0),
-            voltageMillivolts = this["POWER_SUPPLY_VOLTAGE_NOW"]?.toIntOrNull()?.div(1000),
-            status = this["POWER_SUPPLY_STATUS"],
-            health = this["POWER_SUPPLY_HEALTH"],
-            raw = this
+            levelPercent = values["POWER_SUPPLY_CAPACITY"]?.toIntOrNull(),
+            temperatureCelsius = values["POWER_SUPPLY_TEMP"]?.toDoubleOrNull()?.div(10.0),
+            voltageMillivolts = values["POWER_SUPPLY_VOLTAGE_NOW"]?.toIntOrNull()?.div(1000),
+            status = values["POWER_SUPPLY_STATUS"],
+            health = values["POWER_SUPPLY_HEALTH"],
+            raw = values
         )
     }
 }
