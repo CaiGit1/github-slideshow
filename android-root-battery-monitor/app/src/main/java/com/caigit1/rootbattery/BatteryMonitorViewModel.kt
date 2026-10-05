@@ -2,6 +2,9 @@ package com.caigit1.rootbattery
 
 import android.app.Application
 import android.content.Intent
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
@@ -24,8 +27,21 @@ data class BatteryMonitorUiState(
 
 class BatteryMonitorViewModel(
     application: Application,
-    private val repository: BatteryMonitorRepository = BatteryMonitorRepository()
+    private val repository: BatteryMonitorRepository
 ) : AndroidViewModel(application) {
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+                if (modelClass.isAssignableFrom(BatteryMonitorViewModel::class.java)) {
+                    val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY])
+                    return BatteryMonitorViewModel(application, BatteryMonitorRepository()) as T
+                }
+                throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+            }
+        }
+    }
 
     private val _uiState = MutableStateFlow(BatteryMonitorUiState())
     val uiState: StateFlow<BatteryMonitorUiState> = _uiState.asStateFlow()
