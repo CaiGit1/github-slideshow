@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
-                val vm: BatteryMonitorViewModel = viewModel()
+                val vm: BatteryMonitorViewModel = viewModel(factory = BatteryMonitorViewModel.Factory)
                 val ui by vm.uiState.collectAsState()
                 BatteryMonitorScreen(
                     uiState = ui,
